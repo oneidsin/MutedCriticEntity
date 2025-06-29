@@ -1,5 +1,6 @@
 package com.example.entity.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -37,11 +38,14 @@ public class User {
 
     @CreationTimestamp
     @Column(name = "join_date")
-    private LocalDateTime joinDate;
+    private LocalDate joinDate;
 
     @Column(name = "withdraw_date")
-    private LocalDateTime withdrawDate;
+    private LocalDate withdrawDate;
 
     @Column(name = "receive_yn")
     private Boolean receiveYn;
+
+    @Column(name = "last_access_date")
+    private LocalDateTime lastAccessDate;
 }
