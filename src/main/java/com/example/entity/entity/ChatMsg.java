@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -17,32 +18,35 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "noti")
-public class Noti {
+@Table(name = "chat_msg")
+public class ChatMsg {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int notiIdx;
+    @Column(name = "msg_idx")
+    private int msgIdx;
 
-    @Column(name = "type", length = 20)
-    private String type;
+    // 외래키(chat_room 테이블의 room_idx)
+    @ManyToOne
+    @JoinColumn(name = "room_idx")
+    private ChatRoom chatRoom;
 
-    @Column(name = "content")
-    private String content;
-
-    @Column(name = "related_idx")
-    private int relatedIdx;
-
-    @Column(name = "read_yn")
-    private Boolean readYn;
-
-    @CreationTimestamp
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    // 외래키(member 테이블의 member_id)
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     // 외래키(user 테이블의 user_id)
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Lob
+    @Column(name = "msg_content", columnDefinition = "longtext")
+    private String msgContent;
+
+    @CreationTimestamp
+    @Column(name = "sent_at")
+    private LocalDateTime sentAt;
 
 }

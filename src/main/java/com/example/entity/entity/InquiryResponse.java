@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -17,32 +18,25 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "noti")
-public class Noti {
+@Table(name = "inquiry_response")
+public class InquiryResponse {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int notiIdx;
+    @Column(name = "response_idx")
+    private int responseIdx;
 
-    @Column(name = "type", length = 20)
-    private String type;
+    // 외래키(inquiry 테이블의 inquiry_idx)
+    @ManyToOne
+    @JoinColumn(name = "inquiry_idx")
+    private Inquiry inquiry;
 
-    @Column(name = "content")
+    @Lob
+    @Column(name = "content", columnDefinition = "longtext")
     private String content;
-
-    @Column(name = "related_idx")
-    private int relatedIdx;
-
-    @Column(name = "read_yn")
-    private Boolean readYn;
 
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    // 외래키(user 테이블의 user_id)
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
 
 }
