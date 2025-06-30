@@ -70,6 +70,6 @@ public class User {
     @Column(name = "churn_risk")
     private boolean churnRisk;
 
-    @Column(name = "all_play_time")
-    private int allPlayTime;
+    @Column(name = "total_play_time")
+    private int totalPlayTime;
 }

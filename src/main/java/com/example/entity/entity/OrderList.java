@@ -39,6 +39,4 @@ public class OrderList {
     @Column(name = "sales")
     private int sales;
 
-
-
 }

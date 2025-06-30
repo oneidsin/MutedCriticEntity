@@ -4,8 +4,6 @@ import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -17,7 +15,6 @@ import lombok.Data;
 public class Member {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id", length = 50)
     private String memberId;
 
@@ -35,5 +32,11 @@ public class Member {
 
     @Column(name = "withdraw_date")
     private LocalDate withdrawDate;
+
+    @Column(name = "job", length = 20)
+    private String job;
+
+    @Column(name = "dept_name", length = 20)
+    private String deptName;
 
 }
