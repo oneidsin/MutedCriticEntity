@@ -55,8 +55,8 @@ public class User {
     @Column(name = "user_normal")
     private boolean userNormal;
 
-    @Column(name = "user_vip")
-    private boolean userVip;
+    @Column(name = "is_vip")
+    private boolean isVip;
 
     @Column(name = "user_dormant")
     private boolean userDormant;
