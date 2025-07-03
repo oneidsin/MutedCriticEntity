@@ -1,15 +1,19 @@
 package com.example.entity.entity;
 
-import java.time.LocalDateTime;
-
-import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+
+import java.time.LocalDateTime;
+
+import javax.persistence.Column;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.Data;
 
@@ -23,23 +27,18 @@ public class ChatRoom {
     @Column(name = "room_idx")
     private int roomIdx;
 
-    // 외래키(member 테이블의 member_id)
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @Column(name = "room_name")
+    private String roomName;
 
-    // 외래키(user 테이블의 user_id)
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private Member owner;
+
+    @Column(name = "room_type")
+    private String roomType; // 'private' or 'group'
 
     @Column(name = "created_at")
+    @CreationTimestamp
     private LocalDateTime createdAt;
-
-    @Column(name = "closed_at")
-    private LocalDateTime closedAt;
-
-    @Column(name = "status")
-    private boolean status;
 
 }
