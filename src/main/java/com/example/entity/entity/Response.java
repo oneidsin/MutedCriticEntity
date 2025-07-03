@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,8 +19,8 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "inquiry_response")
-public class InquiryResponse {
+@Table(name = "response")
+public class Response {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,9 +28,16 @@ public class InquiryResponse {
     private int responseIdx;
 
     // 외래키(inquiry 테이블의 inquiry_idx)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inquiry_idx")
     private Inquiry inquiry;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agent_id")
+    private Member agent;
+
+    @Column(name = "res_type", length = 10)
+    private String resType;
 
     @Lob
     @Column(name = "content", columnDefinition = "longtext")

@@ -1,43 +1,46 @@
 package com.example.entity.entity;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Column;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "order_list")
-public class OrderList {
+@Table(name = "user_memo")
+public class UserMemo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_idx")
-    private int orderIdx;
+    @Column(name = "memo_idx")
+    private int memoIdx;
 
     // 외래키(user 테이블의 user_id)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    // 외래키(item_list 테이블의 item_idx)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_idx")
-    private ItemList itemList;
+    @Column(name = "content", length = 1000)
+    private String content;
 
-    @Column(name = "order_date")
-    private LocalDate orderDate;
+    @Column(name = "created_at")
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
-    @Column(name = "sales")
-    private int sales;
+    @Column(name = "updated_at")
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
 }
