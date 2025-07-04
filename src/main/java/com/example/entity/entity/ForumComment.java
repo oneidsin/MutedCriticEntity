@@ -1,10 +1,10 @@
 package com.example.entity.entity;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,26 +16,29 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "order_list")
-public class OrderList {
+@Table(name = "forum_comment")
+public class ForumComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_idx")
-    private int orderIdx;
+    @Column(name = "com_idx")
+    private int comIdx;
 
-    // 외래키(user 테이블의 user_id)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_idx")
+    private ForumPost forumPost;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "item_idx")
-    private int itemIdx;
+    @Column(name = "com_content", columnDefinition = "longtext")
+    private String comContent;
 
-    @Column(name = "item_cate", length = 100)
-    private String itemCate;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-    @Column(name = "order_date")
-    private LocalDate orderDate;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
 }

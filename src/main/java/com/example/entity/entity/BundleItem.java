@@ -11,25 +11,21 @@ import javax.persistence.Table;
 
 import lombok.Data;
 
-// 단일 아이템 리스트
 @Entity
 @Data
-@Table(name = "item_list")
-public class ItemList {
+@Table(name = "bundle_item")
+public class BundleItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_idx")
-    private int itemIdx;
+    @Column(name = "bundle_idx")
+    private int BundleIdx;
 
-    @Column(name = "item_cate", length = 100)
-    private String itemCate;
+    @Column(name = "bundle_price", length = 6)
+    private int bundlePrice;
 
-    @Column(name = "item_name", length = 50)
-    private String itemName;
-
-    @Column(name = "item_price", length = 6)
-    private int itemPrice;
+    @Column(name = "bundle_name", length = 100)
+    private String bundleName;
 
     @Column(name = "sell_type", length = 50)
     private String sellType;
@@ -39,4 +35,5 @@ public class ItemList {
 
     @Column(name = "sell_end_date")
     private LocalDate sellEndDate;
+
 }

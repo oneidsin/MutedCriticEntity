@@ -23,17 +23,18 @@ public class Noti {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "noti_idx")
     private int notiIdx;
 
     @Column(name = "content_pre", length = 500)
     private String contentPre;
-    
+
     @Column(name = "related_idx")
     private int relatedIdx;
-    
+
     @Column(name = "read_yn")
-    private Boolean readYn;
-    
+    private boolean readYn;
+
     @Column(name = "noti_type", length = 20)
     private String notiType;
 
