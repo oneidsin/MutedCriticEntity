@@ -25,17 +25,17 @@ public class Noti {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int notiIdx;
 
-    @Column(name = "type", length = 20)
-    private String type;
-
-    @Column(name = "content")
-    private String content;
-
+    @Column(name = "content_pre", length = 500)
+    private String contentPre;
+    
     @Column(name = "related_idx")
     private int relatedIdx;
-
+    
     @Column(name = "read_yn")
     private Boolean readYn;
+    
+    @Column(name = "noti_type", length = 20)
+    private String notiType;
 
     @CreationTimestamp
     @Column(name = "created_at")
