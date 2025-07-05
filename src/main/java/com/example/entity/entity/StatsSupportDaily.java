@@ -1,9 +1,7 @@
 package com.example.entity.entity;
 
 import javax.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
@@ -11,15 +9,11 @@ import java.time.LocalDate;
 @Table(name = "stats_support_daily", uniqueConstraints = @UniqueConstraint(columnNames = { "stats_date", "ticket_type",
         "category" }))
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class StatsSupportDaily {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "support_stats_id", precision = 19, scale = 0)
+    @Column(name = "support_stats_id")
     private Long supportStatsId;
 
     @Column(name = "stats_date", nullable = false)

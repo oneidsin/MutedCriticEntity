@@ -13,10 +13,14 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "mail")
 public class Mail {
 
@@ -25,15 +29,13 @@ public class Mail {
     @Column(name = "mail_idx")
     private int mailIdx;
 
-    // 메일 템플릿 외래키
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tem_idx")
     private MailTemplate mailTemplate;
 
-    // 회원 외래키
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private User user;
+    private Member member;
 
     @Column(name = "is_to_all")
     private boolean isToAll;
@@ -41,7 +43,7 @@ public class Mail {
     @Column(name = "recipient", columnDefinition = "text")
     private String recipient;
 
-    @Column(name = "mail_sub")
+    @Column(name = "mail_sub", length = 255)
     private String mailSub;
 
     @Lob

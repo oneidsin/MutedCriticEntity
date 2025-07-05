@@ -1,24 +1,18 @@
 package com.example.entity.entity;
 
 import javax.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "stats_activity_daily")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class StatsActivityDaily {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "stats_date", nullable = false)
+    @Column(name = "stats_date")
     private LocalDate statsDate;
 
     @Column(name = "dau")
@@ -30,6 +24,10 @@ public class StatsActivityDaily {
     @Column(name = "dormant_user_count")
     private int dormantUserCount;
 
+    @Column(name = "returning_user_count")
+    private int returningUserCount;
+
     @Column(name = "withdrawn_user_count")
     private int withdrawnUserCount;
+
 }
