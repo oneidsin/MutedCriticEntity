@@ -42,8 +42,8 @@ public class ForumPost {
     @Column(name = "hit")
     private int hit;
 
-    @Column(name = "like")
-    private int like;
+    @Column(name = "likes")
+    private int likes;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

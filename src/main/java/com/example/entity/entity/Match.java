@@ -14,7 +14,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "match")
+@Table(name = "match_table")
 public class Match {
 
     @Id
