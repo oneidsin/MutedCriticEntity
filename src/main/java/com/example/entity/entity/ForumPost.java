@@ -26,7 +26,7 @@ public class ForumPost {
     private int postIdx;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_idx")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Column(name = "topic", length = 50)

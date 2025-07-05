@@ -5,14 +5,12 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 @Embeddable
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@EqualsAndHashCode
 public class ChatMemberId implements Serializable {
 
     @Column(name = "room_idx")

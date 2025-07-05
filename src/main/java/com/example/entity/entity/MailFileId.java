@@ -1,8 +1,7 @@
 package com.example.entity.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -10,8 +9,7 @@ import java.io.Serializable;
 
 @Embeddable
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@EqualsAndHashCode
 public class MailFileId implements Serializable {
 
     @Column(name = "mail_idx")

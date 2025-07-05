@@ -11,7 +11,6 @@ import java.time.LocalDate;
 public class StatsRevenueDaily {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "stats_date")
     private LocalDate statsDate;
 
