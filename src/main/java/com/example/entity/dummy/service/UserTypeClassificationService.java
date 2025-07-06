@@ -6,8 +6,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.entity.dummy.repository.*;
 import com.example.entity.entity.User;
+import com.example.entity.repository.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

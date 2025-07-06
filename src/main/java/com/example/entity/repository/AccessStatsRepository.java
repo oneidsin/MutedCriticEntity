@@ -1,4 +1,4 @@
-package com.example.entity.dummy.repository;
+package com.example.entity.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

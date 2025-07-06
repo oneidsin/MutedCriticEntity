@@ -1,4 +1,4 @@
-package com.example.entity.dummy.repository;
+package com.example.entity.repository;
 
 import java.time.LocalDate;
 import java.util.List;

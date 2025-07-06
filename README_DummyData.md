@@ -40,7 +40,7 @@
 POST http://localhost:8080/api/dummy/master
 
 # 2. 6개월 벌크 데이터 생성
-POST http://localhost:8080/api/dummy/bulk?fromDate=2025-01-05&toDate=2025-07-05
+POST http://localhost:8080/api/dummy/bulk?fromDate=2025-01-06&toDate=2025-07-06
 
 # 3. 유저 타입 분류
 POST http://localhost:8080/api/dummy/classify-users

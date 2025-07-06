@@ -4,16 +4,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import com.example.entity.dummy.repository.*;
 import com.example.entity.entity.*;
+import com.example.entity.repository.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -121,6 +119,9 @@ public class DummyDataService {
         // 7. 시즌별 신규 아이템 생성 (시즌 시작일에만)
         generateSeasonalItems(date);
 
+        // 8. 이벤트 아이템 생성 (이벤트 시작일에만)
+        generateDailyEventItems(date);
+
         log.info("=== {} 일일 데이터 생성 완료 ===", date);
     }
 
@@ -158,9 +159,18 @@ public class DummyDataService {
                 item.setItemName(generateSkinName());
                 item.setItemCate("영웅스킨");
                 item.setItemPrice(getRandomPrice());
-                item.setSellType(getRandomSellType());
-                item.setSellStartDate(LocalDate.now().minusMonths(6));
-                item.setSellEndDate(item.getSellType().equals("상시") ? null : LocalDate.now().plusMonths(3));
+                String sellType = getRandomSellType();
+                item.setSellType(sellType);
+
+                // 이벤트 아이템인 경우 실제 이벤트 날짜 설정
+                if (sellType.startsWith("이벤트(")) {
+                    int eventYear = extractYearFromSellType(sellType);
+                    item.setSellStartDate(getEventStartDate(sellType, eventYear));
+                    item.setSellEndDate(getEventEndDate(sellType, eventYear));
+                } else {
+                    item.setSellStartDate(LocalDate.now().minusMonths(6));
+                    item.setSellEndDate(sellType.equals("상시") ? null : LocalDate.now().plusMonths(3));
+                }
                 itemRepository.save(item);
 
                 // heroes_item 테이블에 관계 설정
@@ -180,9 +190,18 @@ public class DummyDataService {
                 item.setItemName(generateWeaponName());
                 item.setItemCate("무기스킨");
                 item.setItemPrice(getRandomPrice());
-                item.setSellType(getRandomSellType());
-                item.setSellStartDate(LocalDate.now().minusMonths(6));
-                item.setSellEndDate(item.getSellType().equals("상시") ? null : LocalDate.now().plusMonths(3));
+                String sellType = getRandomSellType();
+                item.setSellType(sellType);
+
+                // 이벤트 아이템인 경우 실제 이벤트 날짜 설정
+                if (sellType.startsWith("이벤트(")) {
+                    int eventYear = extractYearFromSellType(sellType);
+                    item.setSellStartDate(getEventStartDate(sellType, eventYear));
+                    item.setSellEndDate(getEventEndDate(sellType, eventYear));
+                } else {
+                    item.setSellStartDate(LocalDate.now().minusMonths(6));
+                    item.setSellEndDate(sellType.equals("상시") ? null : LocalDate.now().plusMonths(3));
+                }
                 itemRepository.save(item);
 
                 // heroes_item 테이블에 관계 설정
@@ -202,9 +221,18 @@ public class DummyDataService {
                 item.setItemName(generateHighlightName());
                 item.setItemCate("하이라이트연출");
                 item.setItemPrice(getRandomPrice());
-                item.setSellType(getRandomSellType());
-                item.setSellStartDate(LocalDate.now().minusMonths(6));
-                item.setSellEndDate(item.getSellType().equals("상시") ? null : LocalDate.now().plusMonths(3));
+                String sellType = getRandomSellType();
+                item.setSellType(sellType);
+
+                // 이벤트 아이템인 경우 실제 이벤트 날짜 설정
+                if (sellType.startsWith("이벤트(")) {
+                    int eventYear = extractYearFromSellType(sellType);
+                    item.setSellStartDate(getEventStartDate(sellType, eventYear));
+                    item.setSellEndDate(getEventEndDate(sellType, eventYear));
+                } else {
+                    item.setSellStartDate(LocalDate.now().minusMonths(6));
+                    item.setSellEndDate(sellType.equals("상시") ? null : LocalDate.now().plusMonths(3));
+                }
                 itemRepository.save(item);
 
                 // heroes_item 테이블에 관계 설정
@@ -258,9 +286,9 @@ public class DummyDataService {
         List<Heroes> heroes = heroesRepository.findAll();
         int currentYear = LocalDate.now().getYear();
 
-        // 최근 3년간 이벤트 아이템 생성 (2시즌마다 새로운 이벤트)
+        // 최근 3년간 이벤트 아이템 생성 (매 시즌마다 새로운 이벤트)
         for (int year = currentYear - 2; year <= currentYear; year++) {
-            for (int season = 1; season <= 3; season += 2) { // 1, 3시즌에 이벤트 (2시즌마다)
+            for (int season = 1; season <= 6; season++) { // 1년에 6시즌 (2달마다)
                 String eventName = EVENT_NAMES[faker.number().numberBetween(0, EVENT_NAMES.length)];
                 String sellType = "이벤트(" + year + "년 " + eventName + ")";
 
@@ -273,8 +301,9 @@ public class DummyDataService {
     }
 
     private void generateEventItemsForSeason(List<Heroes> heroes, String sellType, int year, int season) {
-        LocalDate eventStart = LocalDate.of(year, (season - 1) * 2 + 1, 1);
-        LocalDate eventEnd = eventStart.plusMonths(1); // 한 달간 이벤트
+        // 이벤트 종류에 따른 실제 날짜 설정
+        LocalDate eventStart = getEventStartDate(sellType, year);
+        LocalDate eventEnd = getEventEndDate(sellType, year);
 
         // 이벤트 전용 영웅 스킨 (인기 영웅 위주로 5-10개)
         List<Heroes> popularHeroes = heroes.stream()
@@ -564,20 +593,17 @@ public class DummyDataService {
     }
 
     private String generateSkinName() {
-        String[] skinGrades = { "전설", "서사", "희귀", "일반", "특별", "한정", "프리미엄", "컬렉터", "마스터" };
         String[] skinThemes = { "사이버펑크", "스팀펑크", "고딕", "클래식", "미래형", "레트로", "네온", "홀로그램",
                 "크리스탈", "용암", "얼음", "번개", "그림자", "빛", "우주", "기계", "자연", "바다" };
         String[] skinStyles = { "워리어", "어쌔신", "가디언", "스나이퍼", "메딕", "탱커", "스피드스터", "마법사",
                 "사무라이", "닌자", "기사", "해적", "로봇", "엘프", "드래곤", "피닉스" };
 
-        // 30% 확률로 3단어, 70% 확률로 2단어
-        if (faker.number().numberBetween(1, 11) <= 3) {
-            return skinGrades[faker.number().numberBetween(0, skinGrades.length)] + " " +
-                    skinThemes[faker.number().numberBetween(0, skinThemes.length)] + " " +
+        // 50% 확률로 2단어, 50% 확률로 1단어
+        if (faker.number().numberBetween(1, 11) <= 5) {
+            return skinThemes[faker.number().numberBetween(0, skinThemes.length)] + " " +
                     skinStyles[faker.number().numberBetween(0, skinStyles.length)] + " 스킨";
         } else {
-            return skinGrades[faker.number().numberBetween(0, skinGrades.length)] + " " +
-                    skinThemes[faker.number().numberBetween(0, skinThemes.length)] + " 스킨";
+            return skinThemes[faker.number().numberBetween(0, skinThemes.length)] + " 스킨";
         }
     }
 
@@ -588,7 +614,7 @@ public class DummyDataService {
                 "건", "레이", "볼트", "스트림", "웨이브", "버스트", "스톰" };
 
         return weaponMaterials[faker.number().numberBetween(0, weaponMaterials.length)] + " " +
-                weaponStyles[faker.number().numberBetween(0, weaponStyles.length)] + " 무기";
+                weaponStyles[faker.number().numberBetween(0, weaponStyles.length)];
     }
 
     private String generateHighlightName() {
@@ -614,19 +640,16 @@ public class DummyDataService {
     }
 
     private String getEventSkinName(String sellType) {
-        String[] eventGrades = { "한정판", "특별판", "기념판", "축제", "프리미엄", "컬렉터", "이벤트", "레어" };
         String[] eventThemes = { "윈터", "할로윈", "설날", "여름", "추석", "크리스마스", "신년", "봄꽃", "가을",
                 "파티", "축제", "기념", "특별", "황금", "다이아몬드" };
         String[] eventStyles = { "에디션", "컬렉션", "시리즈", "버전", "스페셜", "익스클루시브", "리미티드" };
 
-        return eventGrades[faker.number().numberBetween(0, eventGrades.length)] + " " +
-                eventThemes[faker.number().numberBetween(0, eventThemes.length)] + " " +
+        return eventThemes[faker.number().numberBetween(0, eventThemes.length)] + " " +
                 eventStyles[faker.number().numberBetween(0, eventStyles.length)] + " 스킨";
     }
 
     private String getEventHighlightName(String sellType) {
-        String[] eventActions = { "축제의", "기념", "특별한", "한정", "프리미엄", "컬렉터", "이벤트", "레어",
-                "골든", "다이아몬드", "플래티넘", "마스터" };
+        String[] eventActions = { "축제의", "기념", "특별한", "신년", "봄꽃", "가을", "윈터", "할로윈", "설날", "여름", "추석", "크리스마스" };
         String[] eventMoments = { "순간", "연출", "승리", "하이라이트", "모멘트", "액션", "플레이", "피니시",
                 "콤보", "스킬", "테크닉", "퍼포먼스" };
 
@@ -653,7 +676,7 @@ public class DummyDataService {
         for (int i = 0; i < faker.number().numberBetween(5, 9); i++) {
             Heroes hero = getRandomHero(heroes);
             ItemList seasonSkin = new ItemList();
-            seasonSkin.setItemName("시즌" + currentSeason + " " + generateSkinName());
+            seasonSkin.setItemName(generateSkinName());
             seasonSkin.setItemCate("영웅스킨");
             seasonSkin.setItemPrice(getRandomPrice());
             seasonSkin.setSellType("한정");
@@ -673,7 +696,7 @@ public class DummyDataService {
         for (int i = 0; i < faker.number().numberBetween(3, 6); i++) {
             Heroes hero = getRandomHero(heroes);
             ItemList seasonWeapon = new ItemList();
-            seasonWeapon.setItemName("시즌" + currentSeason + " " + generateWeaponName());
+            seasonWeapon.setItemName(generateWeaponName());
             seasonWeapon.setItemCate("무기스킨");
             seasonWeapon.setItemPrice(getRandomPrice());
             seasonWeapon.setSellType("한정");
@@ -693,7 +716,7 @@ public class DummyDataService {
         for (int i = 0; i < faker.number().numberBetween(2, 4); i++) {
             Heroes hero = getRandomHero(heroes);
             ItemList seasonHighlight = new ItemList();
-            seasonHighlight.setItemName("시즌" + currentSeason + " " + generateHighlightName());
+            seasonHighlight.setItemName(generateHighlightName());
             seasonHighlight.setItemCate("하이라이트연출");
             seasonHighlight.setItemPrice(getRandomPrice());
             seasonHighlight.setSellType("한정");
@@ -710,6 +733,74 @@ public class DummyDataService {
         }
 
         log.info("시즌 {} 신규 아이템 생성 완료", currentSeason);
+    }
+
+    private void generateDailyEventItems(LocalDate date) {
+        // 매 시즌마다 이벤트 시작일 체크 (시즌 시작일에 이벤트 시작)
+        if (!isSeasonStartDate(date)) {
+            return;
+        }
+
+        int currentSeason = getCurrentSeason(date);
+        int year = date.getYear();
+
+        // 랜덤 이벤트 선택
+        String eventName = EVENT_NAMES[faker.number().numberBetween(0, EVENT_NAMES.length)];
+        String sellType = "이벤트(" + year + "년 " + eventName + ")";
+
+        log.info("시즌 {} 이벤트 아이템 생성 시작: {}", currentSeason, eventName);
+
+        List<Heroes> heroes = heroesRepository.findAll();
+
+        // 이벤트 시작일과 종료일 계산 (이벤트 년도에 맞춰)
+        LocalDate eventStart = getEventStartDate(sellType, year);
+        LocalDate eventEnd = getEventEndDate(sellType, year);
+
+        // 이벤트 전용 영웅 스킨 (3-5개)
+        List<Heroes> eventHeroes = heroes.stream()
+                .limit(faker.number().numberBetween(3, 6))
+                .collect(Collectors.toList());
+
+        for (Heroes hero : eventHeroes) {
+            ItemList eventSkin = new ItemList();
+            eventSkin.setItemName(getEventSkinName(sellType));
+            eventSkin.setItemCate("영웅스킨");
+            eventSkin.setItemPrice(getRandomPrice());
+            eventSkin.setSellType(sellType);
+            eventSkin.setSellStartDate(eventStart);
+            eventSkin.setSellEndDate(eventEnd);
+            itemRepository.save(eventSkin);
+
+            // heroes_item 테이블에 관계 설정
+            if (hero.getItems() == null) {
+                hero.setItems(new ArrayList<>());
+            }
+            hero.getItems().add(eventSkin);
+            heroesRepository.save(hero);
+        }
+
+        // 이벤트 전용 하이라이트 연출 (2-3개)
+        for (int i = 0; i < faker.number().numberBetween(2, 4); i++) {
+            Heroes hero = getRandomHero(heroes);
+            ItemList eventHighlight = new ItemList();
+            eventHighlight.setItemName(getEventHighlightName(sellType));
+            eventHighlight.setItemCate("하이라이트연출");
+            eventHighlight.setItemPrice(getRandomPrice());
+            eventHighlight.setSellType(sellType);
+            eventHighlight.setSellStartDate(eventStart);
+            eventHighlight.setSellEndDate(eventEnd);
+            itemRepository.save(eventHighlight);
+
+            // heroes_item 테이블에 관계 설정
+            if (hero.getItems() == null) {
+                hero.setItems(new ArrayList<>());
+            }
+            hero.getItems().add(eventHighlight);
+            heroesRepository.save(hero);
+        }
+
+        log.info("시즌 {} 이벤트 아이템 생성 완료: {} ({}개 아이템)", currentSeason, eventName,
+                eventHeroes.size() + faker.number().numberBetween(2, 4));
     }
 
     private boolean isSeasonStartDate(LocalDate date) {
@@ -809,5 +900,45 @@ public class DummyDataService {
     private int getCurrentSeason(LocalDate date) {
         // 2달마다 시즌 변경
         return (int) (ChronoUnit.MONTHS.between(LocalDate.of(2025, 1, 1), date) / 2) + 1;
+    }
+
+    private LocalDate getEventStartDate(String sellType, int year) {
+        // 이벤트 이름에서 실제 이벤트 추출
+        if (sellType.contains("윈터원더랜드")) {
+            return LocalDate.of(year, 12, 15); // 12월 중순부터
+        } else if (sellType.contains("할로윈테러")) {
+            return LocalDate.of(year, 10, 20); // 10월 말부터
+        } else if (sellType.contains("설날이벤트")) {
+            return LocalDate.of(year, 1, 20); // 1월 말부터
+        } else if (sellType.contains("여름축제")) {
+            return LocalDate.of(year, 7, 15); // 7월 중순부터
+        } else if (sellType.contains("추석이벤트")) {
+            return LocalDate.of(year, 9, 10); // 9월 초부터
+        } else if (sellType.contains("크리스마스축제")) {
+            return LocalDate.of(year, 12, 20); // 12월 말부터
+        }
+        // 기본값: 해당 년도 중간
+        return LocalDate.of(year, 6, 1);
+    }
+
+    private LocalDate getEventEndDate(String sellType, int year) {
+        // 이벤트 이름에서 실제 이벤트 추출 (모든 이벤트 2주일 기간)
+        LocalDate startDate = getEventStartDate(sellType, year);
+        return startDate.plusWeeks(2); // 2주일 후 종료
+    }
+
+    private int extractYearFromSellType(String sellType) {
+        // "이벤트(2023년 할로윈테러)" 형태에서 년도 추출
+        if (sellType.startsWith("이벤트(") && sellType.contains("년")) {
+            try {
+                int startIndex = sellType.indexOf("(") + 1;
+                int endIndex = sellType.indexOf("년");
+                return Integer.parseInt(sellType.substring(startIndex, endIndex));
+            } catch (NumberFormatException e) {
+                // 파싱 실패 시 현재 년도 반환
+                return LocalDate.now().getYear();
+            }
+        }
+        return LocalDate.now().getYear();
     }
 }
